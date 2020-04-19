@@ -1,2 +1,3 @@
 # bench-append-only
-Append only benchmark for SQL Database
+
+Append-only benchmark for SQL Database
