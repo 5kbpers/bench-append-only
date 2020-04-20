@@ -15,7 +15,7 @@ var (
 	tables  = flag.Uint64("tables", 1, "The number of tables")
 	base    = flag.Uint64("base", 0, "The base number of inserted rows")
 	threads = flag.Uint64("threads", 64, "The number of threads")
-	dsn     = flag.String("dsb", "", "The DSN of the target database")
+	dsn     = flag.String("dsn", "", "The DSN of the target database")
 )
 
 func main() {
