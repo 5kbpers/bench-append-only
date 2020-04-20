@@ -32,7 +32,7 @@ func (m *mysqlDB) Insert(seq uint64) error {
 func (m *mysqlDB) CreateTables() error {
 	for i := uint64(0); i < m.tables; i++ {
 		tableName := fmt.Sprintf("test%d", i)
-		sql := fmt.Sprintf("CREATE TABLE %s IF NOT EXISTS (id bigint PRIMARY KEY);", tableName)
+		sql := fmt.Sprintf("CREATE TABLE IF NOT EXISTS %s (id bigint PRIMARY KEY);", tableName)
 		if _, err := m.db.Exec(sql); err != nil {
 			return err
 		}

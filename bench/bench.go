@@ -23,16 +23,18 @@ func newWorker(number uint64, tables uint64, dsn string) (*worker, error) {
 }
 
 func (w *worker) run(ctx context.Context, base uint64, pace uint64) {
-	select {
-	case <-ctx.Done():
-		fmt.Printf("[worker %d] worker exited, current number is %d\n", w.number, base)
-		return
-	default:
-		err := w.db.Insert(base)
-		if err != nil {
-			panic(err)
+	for {
+		select {
+		case <-ctx.Done():
+			fmt.Printf("[worker %d] worker exited, current number is %d\n", w.number, base)
+			return
+		default:
+			err := w.db.Insert(base)
+			if err != nil {
+				panic(err)
+			}
+			base += pace
 		}
-		base += pace
 	}
 }
 
