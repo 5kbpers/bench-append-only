@@ -22,27 +22,28 @@ func newWorker(number uint64, tables uint64, dsn string) (*worker, error) {
 	}, nil
 }
 
-func (w *worker) run(ctx context.Context, base uint64, pace uint64) {
+func (w *worker) run(ctx context.Context, base uint64, pace uint64, batchSize uint64) {
 	for {
 		select {
 		case <-ctx.Done():
 			fmt.Printf("[worker %d] worker exited, current number is %d\n", w.number, base)
 			return
 		default:
-			err := w.db.Insert(base)
+			err := w.db.InsertBatch(base, pace, batchSize)
 			if err != nil {
 				panic(err)
 			}
-			base += pace
+			base += pace * batchSize
 		}
 	}
 }
 
 type Benchmark struct {
-	dsn     string
-	base    uint64
-	threads uint64
-	tables  uint64
+	dsn       string
+	base      uint64
+	threads   uint64
+	tables    uint64
+	batchSize uint64
 }
 
 func (b *Benchmark) Run(ctx context.Context) {
@@ -61,20 +62,21 @@ func (b *Benchmark) Run(ctx context.Context) {
 			panic(err)
 		}
 		wg.Add(1)
-		go func(base uint64, pace uint64) {
-			worker.run(ctx, base, pace)
+		go func(base uint64, pace uint64, batchSize uint64) {
+			worker.run(ctx, base, pace, batchSize)
 			wg.Done()
-		}(b.base+i, b.threads)
+		}(b.base+i, b.threads, b.batchSize)
 	}
 
 	wg.Wait()
 }
 
-func NewBenchmark(base uint64, threads uint64, tables uint64, dsn string) *Benchmark {
+func NewBenchmark(base uint64, threads uint64, tables uint64, batchSize uint64, dsn string) *Benchmark {
 	return &Benchmark{
-		base:    base,
-		threads: threads,
-		tables:  tables,
-		dsn:     dsn,
+		base:      base,
+		threads:   threads,
+		tables:    tables,
+		batchSize: batchSize,
+		dsn:       dsn,
 	}
 }

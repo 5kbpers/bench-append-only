@@ -9,7 +9,7 @@ import (
 
 type DB interface {
 	CreateTables() error
-	Insert(uint64) error
+	InsertBatch(base uint64, pace uint64, batchSize uint64) error
 }
 
 type mysqlDB struct {
@@ -18,10 +18,13 @@ type mysqlDB struct {
 	db     *sql.DB
 }
 
-func (m *mysqlDB) Insert(seq uint64) error {
+func (m *mysqlDB) InsertBatch(base uint64, pace uint64, batchSize uint64) error {
 	for i := uint64(0); i < m.tables; i++ {
 		tableName := fmt.Sprintf("test%d", i)
-		sql := fmt.Sprintf("INSERT INTO %s (id) VALUES (%d);", tableName, seq)
+		sql := fmt.Sprintf("INSERT INTO %s (id) VALUES (%d)", tableName, base)
+		for j := uint64(1); j < batchSize; j++ {
+			sql += fmt.Sprintf(",(%d)", base+j*pace)
+		}
 		if _, err := m.db.Exec(sql); err != nil {
 			return err
 		}
