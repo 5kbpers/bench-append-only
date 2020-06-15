@@ -34,7 +34,7 @@ func (w *worker) run(ctx context.Context) {
 			fmt.Printf("[worker %d] worker exited, count %d\n", w.number, count)
 			return
 		default:
-			id := r.Int63n(100000000) + 1
+			id := r.Int63n(25000000) + 1
 			// fmt.Printf("[worker %d] random id %d\n", w.number, id)
 			err := w.db.RandomUpdate(id)
 			if err != nil {
